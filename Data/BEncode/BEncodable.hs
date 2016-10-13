@@ -1,41 +1,13 @@
-{-# LANGUaGE TypeFamilies #-}
-{-# LANGUaGE FlexibleInstances #-}
-
 module Data.BEncode.BEncodable
 ( BEncodable(..)
 , bencode
 ) where
 
 import Data.BEncode.Type
+import Data.BEncode.Class
 
-class BEncodable a where
-  data Builder a :: *
-  collect     :: [Builder a] -> Builder a
-  inject      :: a -> Builder a
-  injectLen   :: a -> Builder a
-  injectInt   :: Integer -> Builder a
-  build       :: Builder a -> a
-  beginString :: Builder a
-  beginInt    :: Builder a
-  beginList   :: Builder a
-  beginDict   :: Builder a
-  end         :: Builder a
 
-instance BEncodable [Char] where
-  newtype Builder [Char] = MkStringBuilder ShowS
-  collect = foldr (\(MkStringBuilder x) (MkStringBuilder y) ->
-                      MkStringBuilder (x . y))
-                  (MkStringBuilder id)
-  inject = MkStringBuilder . showString
-  injectLen = MkStringBuilder . shows . length
-  injectInt = MkStringBuilder . shows
-  build (MkStringBuilder x) = x ""
-  beginString = MkStringBuilder $ showString ":"
-  beginInt    = MkStringBuilder $ showString "i"
-  beginList   = MkStringBuilder $ showString "l"
-  beginDict   = MkStringBuilder $ showString "d"
-  end         = MkStringBuilder $ showString "e"
-
+{-# SPECIALIZE bencode :: BEncode String -> String #-}
 bencode :: BEncodable a => BEncode a -> a
 bencode = build . bbuild
 

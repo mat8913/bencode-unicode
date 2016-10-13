@@ -1,4 +1,6 @@
-module Data.BEncode.Type (BEncode(..)) where
+module Data.BEncode.Type
+( BEncode(..)
+) where
 
 data BEncode a = BInt Integer
                | BString a
