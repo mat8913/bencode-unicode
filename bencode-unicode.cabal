@@ -1,0 +1,32 @@
+name:                bencode-unicode
+version:             0
+license:             GPL-3
+license-file:        LICENSE
+author:              Matthew Harm Bekkema
+maintainer:          mbekkema97@gmail.com
+category:            Data
+
+build-type:          Simple
+cabal-version:       >=1.10
+
+source-repository head
+  type:     git
+  location: https://github.com/mat8913/bencode-unicode
+
+library
+  exposed-modules:     Data.BEncode
+                       Data.BEncode.Type
+                       Data.BEncode.Class
+                       Data.BEncode.BDecodable
+                       Data.BEncode.BEncodable
+
+  other-modules:       Data.BEncode.Parser
+                       Data.BEncode.IntConv
+
+  build-depends:       base >= 4.6 && < 5
+                     , text
+                     , bytestring
+                     , integer-gmp
+                     , ghc-prim
+
+  default-language:    Haskell2010
