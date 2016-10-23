@@ -1,6 +1,6 @@
 name:                bencode-unicode
 version:             0
-license:             GPL-3
+license:             BSD3
 license-file:        LICENSE
 author:              Matthew Harm Bekkema
 maintainer:          mbekkema97@gmail.com
