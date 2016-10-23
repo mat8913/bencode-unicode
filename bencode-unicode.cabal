@@ -30,3 +30,18 @@ library
                      , ghc-prim
 
   default-language:    Haskell2010
+
+test-suite test-bencode
+  type:                exitcode-stdio-1.0
+
+  main-is:             Tests/Properties.hs
+
+  build-depends:       base >= 4.6 && < 5
+                     , QuickCheck
+                     , quickcheck-unicode
+                     , text
+                     , bytestring
+                     , integer-gmp
+                     , ghc-prim
+
+  default-language:    Haskell2010
