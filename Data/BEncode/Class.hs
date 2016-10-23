@@ -14,12 +14,15 @@ import qualified Data.List as List
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.Lazy as TextL
+import qualified Data.Text.Lazy.Builder as TextBuilder
+import qualified Data.Text.Lazy.Builder.Int as TextBuilder
 
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as C8
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.ByteString.Lazy.Char8 as C8L
+import qualified Data.ByteString.Builder as BSBuilder
 
 import Data.BEncode.IntConv
 
@@ -57,6 +60,50 @@ instance BEncodable [Char] ShowS where
   beginList   = showString "l"
   beginDict   = showString "d"
   end         = showString "e"
+
+instance BEncodable TextL.Text TextBuilder.Builder where
+  {-# INLINE collect #-}
+  {-# INLINE inject #-}
+  {-# INLINE injectLen #-}
+  {-# INLINE injectInt #-}
+  {-# INLINE build #-}
+  {-# INLINE beginString #-}
+  {-# INLINE beginInt #-}
+  {-# INLINE beginList #-}
+  {-# INLINE beginDict #-}
+  {-# INLINE end #-}
+  collect = mconcat
+  inject = TextBuilder.fromLazyText
+  injectLen = TextBuilder.decimal . TextL.length
+  injectInt = TextBuilder.decimal
+  build = TextBuilder.toLazyText
+  beginString = TextBuilder.singleton ':'
+  beginInt    = TextBuilder.singleton 'i'
+  beginList   = TextBuilder.singleton 'l'
+  beginDict   = TextBuilder.singleton 'd'
+  end         = TextBuilder.singleton 'e'
+
+instance BEncodable BSL.ByteString BSBuilder.Builder where
+  {-# INLINE collect #-}
+  {-# INLINE inject #-}
+  {-# INLINE injectLen #-}
+  {-# INLINE injectInt #-}
+  {-# INLINE build #-}
+  {-# INLINE beginString #-}
+  {-# INLINE beginInt #-}
+  {-# INLINE beginList #-}
+  {-# INLINE beginDict #-}
+  {-# INLINE end #-}
+  collect = mconcat
+  inject = BSBuilder.lazyByteString
+  injectLen = BSBuilder.int64Dec . BSL.length
+  injectInt = BSBuilder.integerDec
+  build = BSBuilder.toLazyByteString
+  beginString = BSBuilder.char7 ':'
+  beginInt    = BSBuilder.char7 'i'
+  beginList   = BSBuilder.char7 'l'
+  beginDict   = BSBuilder.char7 'd'
+  end         = BSBuilder.char7 'e'
 
 class BDecodable a where
   uncons   :: a -> Maybe (Char, a)
