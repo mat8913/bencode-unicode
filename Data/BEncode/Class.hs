@@ -1,5 +1,5 @@
-{-# LANGUaGE FlexibleInstances #-}
-{-# LANGUaGE TypeFamilies #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Data.BEncode.Class
 ( BEncodable(..)
@@ -24,20 +24,19 @@ import qualified Data.ByteString.Lazy.Char8 as C8L
 import Data.BEncode.IntConv
 
 
-class BEncodable a where
-  data Builder a :: *
-  collect     :: [Builder a] -> Builder a
-  inject      :: a -> Builder a
-  injectLen   :: a -> Builder a
-  injectInt   :: Integer -> Builder a
-  build       :: Builder a -> a
-  beginString :: Builder a
-  beginInt    :: Builder a
-  beginList   :: Builder a
-  beginDict   :: Builder a
-  end         :: Builder a
+class BEncodable a b | a -> b, b -> a where
+  collect     :: [b] -> b
+  inject      :: a -> b
+  injectLen   :: a -> b
+  injectInt   :: Integer -> b
+  build       :: b -> a
+  beginString :: b
+  beginInt    :: b
+  beginList   :: b
+  beginDict   :: b
+  end         :: b
 
-instance BEncodable [Char] where
+instance BEncodable [Char] ShowS where
   {-# INLINE collect #-}
   {-# INLINE inject #-}
   {-# INLINE injectLen #-}
@@ -48,19 +47,16 @@ instance BEncodable [Char] where
   {-# INLINE beginList #-}
   {-# INLINE beginDict #-}
   {-# INLINE end #-}
-  newtype Builder [Char] = MkStringBuilder ShowS
-  collect = foldr (\(MkStringBuilder x) (MkStringBuilder y) ->
-                      MkStringBuilder (x . y))
-                  (MkStringBuilder id)
-  inject = MkStringBuilder . showString
-  injectLen = MkStringBuilder . shows . length
-  injectInt = MkStringBuilder . shows
-  build (MkStringBuilder x) = x ""
-  beginString = MkStringBuilder $ showString ":"
-  beginInt    = MkStringBuilder $ showString "i"
-  beginList   = MkStringBuilder $ showString "l"
-  beginDict   = MkStringBuilder $ showString "d"
-  end         = MkStringBuilder $ showString "e"
+  collect = foldr (.) id
+  inject = showString
+  injectLen = shows . length
+  injectInt = shows
+  build x = x ""
+  beginString = showString ":"
+  beginInt    = showString "i"
+  beginList   = showString "l"
+  beginDict   = showString "d"
+  end         = showString "e"
 
 class BDecodable a where
   uncons   :: a -> Maybe (Char, a)
