@@ -24,7 +24,7 @@ import qualified Data.ByteString.Lazy as BSL
 import qualified Data.ByteString.Lazy.Char8 as C8L
 import qualified Data.ByteString.Builder as BSBuilder
 
-import Data.BEncode.IntConv
+import Data.IntCast
 
 
 class BEncodable a b | a -> b, b -> a where
@@ -134,7 +134,7 @@ instance BDecodable Text where
   {-# INLINE null #-}
   uncons = Text.uncons
   splitAt n s = do
-    n' <- integerToInt n
+    n' <- intCastMaybe n
     let (x, xs) = Text.splitAt n' s
     guard (Text.compareLength x n' == EQ)
     return (x, xs)
@@ -146,7 +146,7 @@ instance BDecodable TextL.Text where
   {-# INLINE null #-}
   uncons = TextL.uncons
   splitAt n s = do
-    n' <- integerToInt64 n
+    n' <- intCastMaybe n
     let (x, xs) = TextL.splitAt n' s
     guard (TextL.compareLength x n' == EQ)
     return (x, xs)
@@ -158,7 +158,7 @@ instance BDecodable ByteString where
   {-# INLINE null #-}
   uncons = C8.uncons
   splitAt n s = do
-    n' <- integerToInt n
+    n' <- intCastMaybe n
     let (x, xs) = BS.splitAt n' s
     guard (BS.length x == n')
     return (x, xs)
@@ -170,7 +170,7 @@ instance BDecodable BSL.ByteString where
   {-# INLINE null #-}
   uncons = C8L.uncons
   splitAt n s = do
-    n' <- integerToInt64 n
+    n' <- intCastMaybe n
     let (x, xs) = BSL.splitAt n' s
     guard (BSL.length x == n')
     return (x, xs)
